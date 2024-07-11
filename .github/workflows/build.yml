@@ -29,6 +29,9 @@ jobs:
         with:
           images: xrv40005/python-demo
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v6
@@ -38,7 +41,30 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      
+          outputs: type=docker,dest=/tmp/python-demo.tar
+
+#      - name: Export Docker image
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: .
+#          file: ./Dockerfile
+#          outputs: type=docker,dest=/tmp/python-demo.tar
+
+      - name: Deepbits SBOM Action
+        uses: ./.github/deepbits
+        id: deepbits
+        with:
+          apiKey: ${{ secrets.API_KEY }}
+          path: /tmp/python-demo.tar
+          project: 667d97a2fad9fb62a091c43c
+
+      - name: Generate SBOM Attestation
+        uses: actions/attest-sbom@v1
+        with:
+          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-name: index.docker.io/xrv40005/python-demo
+          sbom-path: ${{ steps.deepbits.outputs.bomPath }}
+          push-to-registry: true
       
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
