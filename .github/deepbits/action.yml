@@ -1,0 +1,28 @@
+name: "Deepbits SBOM Action"
+description: "Create and analyze SBOM for your project to find vulnerabilities and license issues"
+author: "Deepbits Technology Inc."
+branding:
+  icon: "shield"
+  color: "blue"
+inputs:
+  token:
+    description: "The GitHub authentication token"
+    default: ${{ github.token }}
+    required: false
+  apiKey:
+    description: "Deepbits API key for integration"
+    required: false
+  path:
+    description: "Path to the docker image"
+    required: false
+  project:
+    description: "Project ID"
+    required: false
+outputs:
+  bom:
+    description: "The SBOM file in string"
+  bomPath:
+    description: "Path to the SBOM file"
+runs:
+  using: "node20"
+  main: "index.js"
