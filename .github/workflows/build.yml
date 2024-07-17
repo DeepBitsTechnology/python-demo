@@ -43,12 +43,20 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=docker,dest=/tmp/python-demo.tar
 
-#      - name: Export Docker image
-#        uses: docker/build-push-action@v6
+#      - name: Generate SBOM Attestation
+#        uses: actions/attest-sbom@v1
 #        with:
-#          context: .
-#          file: ./Dockerfile
-#          outputs: type=docker,dest=/tmp/python-demo.tar
+#          subject-digest: ${{ steps.push.outputs.digest }}
+#          subject-name: index.docker.io/xrv40005/python-demo
+#          sbom-path: ${{ steps.deepbits.outputs.bomPath }}
+#          push-to-registry: true
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: index.docker.io/xrv40005/python-demo
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
 
       - name: Deepbits SBOM Action
         uses: ./.github/deepbits
@@ -57,18 +65,3 @@ jobs:
           apiKey: ${{ secrets.API_KEY }}
           path: /tmp/python-demo.tar
           project: 667d97a2fad9fb62a091c43c
-
-      - name: Generate SBOM Attestation
-        uses: actions/attest-sbom@v1
-        with:
-          subject-digest: ${{ steps.push.outputs.digest }}
-          subject-name: index.docker.io/xrv40005/python-demo
-          sbom-path: ${{ steps.deepbits.outputs.bomPath }}
-          push-to-registry: true
-      
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: index.docker.io/xrv40005/python-demo
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
