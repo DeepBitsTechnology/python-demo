@@ -59,7 +59,7 @@ jobs:
           push-to-registry: true
 
       - name: Deepbits SBOM Action
-        uses: ./.github/deepbits
+        uses: DeepBitsTechnology/getsbom@v1.5.0
         id: deepbits
         with:
           apiKey: ${{ secrets.API_KEY }}
